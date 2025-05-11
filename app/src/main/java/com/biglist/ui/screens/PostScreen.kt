@@ -2,7 +2,6 @@ package com.biglist.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,7 @@ import com.biglist.model.Post
 import com.biglist.ui.viewModels.HomeViewModel
 
 @Composable
-fun PostScreen(viewModel : HomeViewModel, onBack: () -> Unit){
+fun PostScreen(viewModel : HomeViewModel){
 
 /////////////
     val postsUiState by viewModel.postsUiState.collectAsStateWithLifecycle()
@@ -65,5 +64,4 @@ fun PostItemScreen(post : Post){
             color = Color.Gray
         )
     }
-    Divider(color = Color.LightGray, thickness = 1.dp)
 }

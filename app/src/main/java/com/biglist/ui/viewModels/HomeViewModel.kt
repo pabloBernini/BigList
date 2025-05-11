@@ -1,7 +1,5 @@
 package com.biglist.ui.viewModels
-
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -10,14 +8,9 @@ import com.biglist.model.Post
 import com.biglist.model.User
 import kotlinx.coroutines.launch
 import java.io.IOException
-
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle // Import this
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: AppRepository) : ViewModel() {
 
@@ -32,39 +25,37 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     private fun getAllUsersViewModel() {
-        _usersUiState.value = UsersUiState.Loading // Set loading state before fetching
+        _usersUiState.value = UsersUiState.Loading
 
         viewModelScope.launch {
             try {
                 val fetchedUsers = repository.getAllUsers()
-                _usersUiState.value = UsersUiState.Success(fetchedUsers) // Set success state with data
+                _usersUiState.value = UsersUiState.Success(fetchedUsers)
             } catch (e: IOException) {
-                _usersUiState.value = UsersUiState.Error(e) // Set error state
+                _usersUiState.value = UsersUiState.Error(e)
             }
         }
     }
 
     fun onUserSelected(user: User) {
-        _postsUiState.value = PostsUiState.Loading // Set loading state before fetching
-
+        _postsUiState.value = PostsUiState.Loading
+        Log.d("HomeScreen", "User selected: ${user.name}, currentScreen will be postsScreen")
         viewModelScope.launch {
             try {
                 val fetchedPosts = repository.getUserPosts(user.id ?: 0)
-                _postsUiState.value = PostsUiState.Success(fetchedPosts) // Set success state with data
+                _postsUiState.value = PostsUiState.Success(fetchedPosts)
             } catch (e: IOException) {
-                _postsUiState.value = PostsUiState.Error(e) // Set error state
+                _postsUiState.value = PostsUiState.Error(e)
             }
         }
     }
 
-    // Define sealed class for Users UI State
     sealed class UsersUiState {
         data object Loading : UsersUiState()
         data class Success(val users: List<User>) : UsersUiState()
         data class Error(val error: Throwable) : UsersUiState()
     }
 
-    // Define sealed class for Posts UI State
     sealed class PostsUiState {
         data object Loading : PostsUiState()
         data class Success(val posts: List<Post>) : PostsUiState()

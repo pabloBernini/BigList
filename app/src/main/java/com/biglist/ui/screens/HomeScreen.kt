@@ -1,17 +1,13 @@
 package com.biglist.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,15 +46,15 @@ fun HomeScreen(viewModel : HomeViewModel) {
                     }
                 },
                 navigationIcon = {
-                    if(currentScreen == "postsScreen") {
+                    if(currentScreen == "postScreen") {
                         IconButton(onClick = {
                             currentScreen = "userScreen"
                             topBarTitle = "Users List"
                         }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Return",
-                                tint = Color.White
+                                tint = Color.White,
                             )
                         }
                     }else{
@@ -82,14 +78,12 @@ fun HomeScreen(viewModel : HomeViewModel) {
                 "userScreen" -> {
                     UserScreen(viewModel){user ->
                         viewModel.onUserSelected(user)
-                        topBarTitle = "Post ${user.username}"
+                        topBarTitle = "${user.username} Posts"
                         currentScreen = "postScreen"
                     }
                 }
                 "postScreen" -> {
-                    PostScreen(viewModel){
-                        currentScreen = "userScreen"
-                    }
+                    PostScreen(viewModel)
                 }
             }
         }
