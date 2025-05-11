@@ -17,10 +17,15 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
     private val _usersUiState = MutableStateFlow<UsersUiState>(UsersUiState.Loading)
     val usersUiState: StateFlow<UsersUiState> = _usersUiState.asStateFlow()
 
-    private val _postsUiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading) // Use Initial state for posts initially
+    private val _postsUiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading)
     val postsUiState: StateFlow<PostsUiState> = _postsUiState.asStateFlow()
 
+    private val _testUiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading)
+    val testUiState: StateFlow<PostsUiState> = _testUiState.asStateFlow()
+
     init {
+
+        getAllPostsViewModel()
         getAllUsersViewModel()
     }
 
@@ -31,15 +36,31 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
             try {
                 val fetchedUsers = repository.getAllUsers()
                 _usersUiState.value = UsersUiState.Success(fetchedUsers)
+
             } catch (e: IOException) {
                 _usersUiState.value = UsersUiState.Error(e)
             }
         }
     }
 
+    private fun getAllPostsViewModel() {
+        _testUiState.value = PostsUiState.Loading
+
+        viewModelScope.launch {
+            try {
+                val fetchedPosts = repository.getAllPosts()
+                _testUiState.value = PostsUiState.Success(fetchedPosts)
+                Log.d("aaa", "bbbb")
+
+            } catch (e: IOException) {
+                _testUiState.value = PostsUiState.Error(e)
+            }
+        }
+    }
+
+
     fun onUserSelected(user: User) {
         _postsUiState.value = PostsUiState.Loading
-        Log.d("HomeScreen", "User selected: ${user.name}, currentScreen will be postsScreen")
         viewModelScope.launch {
             try {
                 val fetchedPosts = repository.getUserPosts(user.id ?: 0)
@@ -61,8 +82,20 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
         data class Success(val posts: List<Post>) : PostsUiState()
         data class Error(val error: Throwable) : PostsUiState()
     }
-}
 
+    fun getUserById(id: Int): User? {
+        val currentState = usersUiState.value
+        if (currentState is UsersUiState.Success) {
+            val usersList = currentState.users
+            for (user in usersList) {
+                if (user.id == id) {
+                    return user
+                }
+            }
+        }
+        return null
+    }
+}
 @Suppress("UNCHECKED_CAST")
 class HomeViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

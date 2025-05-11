@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,25 +30,29 @@ import com.biglist.model.User
 import com.biglist.ui.viewModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
+import com.biglist.model.Post
 
 @Composable
-fun UserScreen(viewModel: HomeViewModel, onUserSelected: (User) -> Unit) {
-    val usersUiState by viewModel.usersUiState.collectAsStateWithLifecycle()
+fun HomeList(viewModel: HomeViewModel, onUserSelected: (User) -> Unit) {
+    val postsUiState by viewModel.testUiState.collectAsStateWithLifecycle()
 
-    when (usersUiState) {
-        is HomeViewModel.UsersUiState.Loading -> {
+    when (postsUiState) {
+        is HomeViewModel.PostsUiState.Loading -> {
             LoadingIndicator()
         }
-        is HomeViewModel.UsersUiState.Success -> {
-            val usersList = (usersUiState as HomeViewModel.UsersUiState.Success).users
+        is HomeViewModel.PostsUiState.Success -> {
+            val postsList = (postsUiState as HomeViewModel.PostsUiState.Success).posts
+
             LazyColumn {
-                items(usersList) { user ->
-                    UserItemScreen(user = user, onUserClick = { onUserSelected(user) })
+                items(postsList) { post ->
+                    val user = viewModel.getUserById(post.userId ?: 0)
+                    if(user != null)
+                    PostItemHome(post = post, user = user, onUserSelected)
                 }
             }
         }
-        is HomeViewModel.UsersUiState.Error -> {
-            val error = (usersUiState as HomeViewModel.UsersUiState.Error).error
+        is HomeViewModel.PostsUiState.Error -> {
+            val error = (postsUiState as HomeViewModel.PostsUiState.Error).error
             ErrorMessage(error.localizedMessage ?: "An error occurred")
         }
     }
@@ -97,5 +102,27 @@ fun UserItemScreen(user: User, onUserClick: (User) -> Unit){
                 )
             }
         }
+    }
+}
+@Composable
+fun PostItemHome(post : Post, user : User, onUserSelected: (User) -> Unit){
+
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        UserItemScreen(user = user, onUserClick = { user ->
+            onUserSelected(user)
+        })
+        Text(
+            text = post.title ?: "",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = post.body ?: "No body available",
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
     }
 }

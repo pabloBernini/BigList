@@ -1,6 +1,7 @@
 package com.biglist.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -76,10 +77,15 @@ fun HomeScreen(viewModel : HomeViewModel) {
         ){
             when (currentScreen){
                 "userScreen" -> {
-                    UserScreen(viewModel){user ->
+                    HomeList(viewModel){user ->
+                        ///// jak zabraknie tej funkcji,
+                        ////to ne laduja sie posty,
+                        ///czyli trzeba dodac to samo w
+                        ////viewmodelu i ew przekazac dali
                         viewModel.onUserSelected(user)
                         topBarTitle = "${user.username} Posts"
                         currentScreen = "postScreen"
+                        Log.d("aaa", "bbbb")
                     }
                 }
                 "postScreen" -> {

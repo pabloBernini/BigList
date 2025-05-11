@@ -11,6 +11,10 @@ import retrofit2.http.Query
         suspend fun getAllUsers(): List<User>
 
         @GET("posts")
+        suspend fun getAllPosts(): List<Post>
+
+
+        @GET("posts")
         suspend fun getUserPosts(@Query("userId") userId: Int): List<Post>
     }
 
