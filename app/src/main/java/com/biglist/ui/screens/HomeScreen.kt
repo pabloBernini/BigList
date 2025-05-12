@@ -33,7 +33,11 @@ import androidx.compose.runtime.getValue
 import com.biglist.model.Post
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onUserSelected: (User) -> Unit) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onUserSelected: (User) -> Unit,
+    onPostSelected: (Post) -> Unit
+) {
     val postsUiState by viewModel.testUiState.collectAsStateWithLifecycle()
 
     when (postsUiState) {
@@ -48,7 +52,7 @@ fun HomeScreen(viewModel: HomeViewModel, onUserSelected: (User) -> Unit) {
                 items(postsList) { post ->
                     val user = viewModel.getUserById(post.userId ?: 0)
                     if (user != null)
-                        PostItemHome(post = post, user = user, onUserSelected)
+                        PostItemHome(post = post, user = user, onUserSelected, onPostSelected)
                 }
             }
         }
@@ -71,63 +75,55 @@ fun ErrorMessage(message: String) {
     Text("Error: $message")
 }
 
+
+
 @Composable
-fun UserItemScreen(user: User, onUserClick: (User) -> Unit) {
+fun PostItemHome(post: Post, user: User, onUserClick: (User) -> Unit, onPostClick: (Post) -> Unit) {
+
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.elevatedCardElevation(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(5.dp)
             .background(Color.White)
-            .clickable { onUserClick(user) }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "User",
-                tint = Color.Black,
-                modifier = Modifier.size(50.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            Column(
+                modifier = Modifier
+                    .background(Color.Gray)
+                    .padding(10.dp)
+                    .clickable { onUserClick(user) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "User",
+                    tint = Color.Black,
+                    modifier = Modifier.size(50.dp)
+                )
+
                 Text(
                     text = user.username ?: "UNKNOWN",
-                    fontSize = 20.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clickable { onPostClick(post) }
+            ) {
+
                 Text(
-                    text = user.name ?: "UNKNOWN",
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                    text = post.title ?: "",
+                    fontSize = 20.sp,
                 )
             }
+
         }
-    }
-}
-
-@Composable
-fun PostItemHome(post: Post, user: User, onUserSelected: (User) -> Unit) {
-
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        UserItemScreen(user = user, onUserClick = { user ->
-            onUserSelected(user)
-        })
-        Text(
-            text = post.title ?: "",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = post.body ?: "No body available",
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
     }
 }

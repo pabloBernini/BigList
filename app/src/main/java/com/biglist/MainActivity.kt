@@ -35,6 +35,7 @@ import com.biglist.ui.viewModels.HomeViewModelFactory
 import com.biglist.ui.theme.ListUsersTheme
 import com.biglist.model.NavigationDestinations
 import com.biglist.ui.screens.HomeScreen
+import com.biglist.ui.screens.UserScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -66,14 +67,15 @@ fun AppScreen(viewModel: HomeViewModel) {
         topBar = {
             TopAppBar(
                 title = {
-                Text(
-                    when (currentRoute) {
-                        NavigationDestinations.HOME_SCREEN -> "Users List"
-                        "${NavigationDestinations.POST_SCREEN}/{userId}" -> "User Posts" // You might want to show the username here
-                        else -> ""
-                    }, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
-                )
-            },
+                    Text(
+                        when (currentRoute) {
+                            NavigationDestinations.HOME_SCREEN -> "Users List"
+                            NavigationDestinations.USER_SCREEN -> "User Details"
+                            "${NavigationDestinations.POST_SCREEN}/{userId}" -> "Post Details"
+                            else -> ""
+                        }, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
+                    )
+                },
                 navigationIcon = {
                     if (currentRoute != NavigationDestinations.HOME_SCREEN) {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -99,14 +101,26 @@ fun AppScreen(viewModel: HomeViewModel) {
             startDestination = NavigationDestinations.HOME_SCREEN,
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable(NavigationDestinations.HOME_SCREEN) {
+            composable(
+                NavigationDestinations.HOME_SCREEN
+            ) {
+
+                    backStackEntry ->
                 HomeScreen(
                     viewModel = viewModel, onUserSelected = { user ->
-                        navController.navigate("${NavigationDestinations.POST_SCREEN}/${user.id}")
+                        navController.navigate(NavigationDestinations.USER_SCREEN)
                         viewModel.onUserSelected(user)
+                    },
+                    onPostSelected = { post ->
+                        navController.navigate("${NavigationDestinations.POST_SCREEN}/${post.userId}")
                     })
             }
+            composable(
+                route = NavigationDestinations.USER_SCREEN,
+            ) { backStackEntry ->
 
+                UserScreen(viewModel)
+            }
             composable(
                 route = "${NavigationDestinations.POST_SCREEN}/{userId}",
                 arguments = listOf(navArgument("userId") {
@@ -116,7 +130,9 @@ fun AppScreen(viewModel: HomeViewModel) {
                 val userId = backStackEntry.arguments?.getInt("userId")
 
                 if (userId != null) {
-                    PostScreen(viewModel, userId)
+                    PostScreen(viewModel, userId, onPostSelected = {
+                        navController.navigate(NavigationDestinations.POST_SCREEN)
+                    })
                 } else {
                     Text(
                         "Błąd: Nie można załadować postów użytkownika.",

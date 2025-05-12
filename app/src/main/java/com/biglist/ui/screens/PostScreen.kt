@@ -1,13 +1,10 @@
 package com.biglist.ui.screens
 
-import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,35 +18,17 @@ import com.biglist.model.Post
 import com.biglist.ui.viewModels.HomeViewModel
 
 @Composable
-fun PostScreen(viewModel: HomeViewModel, userId: Int) {
+fun PostScreen(viewModel: HomeViewModel, userId: Int, onPostSelected: () -> Unit) {
 
 /////////////
     val postsUiState by viewModel.postsUiState.collectAsStateWithLifecycle()
+    Column(
+        modifier = Modifier.padding(16.dp).clickable{onPostSelected()}
+    ){
 
-    when (postsUiState) {
-        is HomeViewModel.PostsUiState.Loading -> {
-            LoadingIndicator()
-            Log.d("PostScreen", "PostsUiState.Loading")
-
-        }
-
-        is HomeViewModel.PostsUiState.Success -> {
-            Log.d("PostScreen", "PostsUiState.Success")
-            val postsList = (postsUiState as HomeViewModel.PostsUiState.Success).posts
-            LazyColumn {
-                items(postsList) { post ->
-                    PostItemScreen(post = post)
-                }
-            }
-        }
-
-        is HomeViewModel.PostsUiState.Error -> {
-            val error = (postsUiState as HomeViewModel.PostsUiState.Error).error
-            ErrorMessage(error.localizedMessage ?: "An error occurred")
-        }
+    Text(text = "$userId")
     }
 }
-
 /////////////////////
 
 
