@@ -1,4 +1,5 @@
 package com.biglist.ui.viewModels
+
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -58,6 +59,7 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    //// this should go to diffrent viewModel
 
     fun onUserSelected(user: User) {
         _postsUiState.value = PostsUiState.Loading
@@ -96,6 +98,7 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
         return null
     }
 }
+
 @Suppress("UNCHECKED_CAST")
 class HomeViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
