@@ -36,21 +36,27 @@ import com.biglist.ui.theme.ListUsersTheme
 import com.biglist.model.NavigationDestinations
 import com.biglist.ui.screens.HomeScreen
 import com.biglist.ui.screens.UserScreen
+import com.biglist.ui.viewModels.PostViewModel
+import com.biglist.ui.viewModels.PostViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: HomeViewModel
+    private lateinit var postViewModel: PostViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val app = application as BigListApplication
         val factory = HomeViewModelFactory(app.repository)
+        val postFactory = PostViewModelFactory(app.repository)
+
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
+        postViewModel = ViewModelProvider(this, postFactory)[PostViewModel::class.java]
 
         setContent {
             ListUsersTheme {
-                AppScreen(viewModel = viewModel)
+                AppScreen(viewModel = viewModel, postViewModel)
             }
         }
     }
@@ -58,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScreen(viewModel: HomeViewModel) {
+fun AppScreen(viewModel: HomeViewModel, postViewModel: PostViewModel) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -71,7 +77,7 @@ fun AppScreen(viewModel: HomeViewModel) {
                         when (currentRoute) {
                             NavigationDestinations.HOME_SCREEN -> "Users List"
                             NavigationDestinations.USER_SCREEN -> "User Details"
-                            "${NavigationDestinations.POST_SCREEN}/{userId}" -> "Post Details"
+                            "${NavigationDestinations.POST_SCREEN}/{id}" -> "Post Details"
                             else -> ""
                         }, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
                     )
@@ -112,7 +118,7 @@ fun AppScreen(viewModel: HomeViewModel) {
                         viewModel.onUserSelected(user)
                     },
                     onPostSelected = { post ->
-                        navController.navigate("${NavigationDestinations.POST_SCREEN}/${post.userId}")
+                        navController.navigate("${NavigationDestinations.POST_SCREEN}/${post.id}")
                     })
             }
             composable(
@@ -122,17 +128,15 @@ fun AppScreen(viewModel: HomeViewModel) {
                 UserScreen(viewModel)
             }
             composable(
-                route = "${NavigationDestinations.POST_SCREEN}/{userId}",
-                arguments = listOf(navArgument("userId") {
+                route = "${NavigationDestinations.POST_SCREEN}/{id}",
+                arguments = listOf(navArgument("id") {
                     type = NavType.IntType
                 })
             ) { backStackEntry ->
-                val userId = backStackEntry.arguments?.getInt("userId")
+                val postId = backStackEntry.arguments?.getInt("id")
 
-                if (userId != null) {
-                    PostScreen(viewModel, userId, onPostSelected = {
-                        navController.navigate(NavigationDestinations.POST_SCREEN)
-                    })
+                if (postId != null) {
+                    PostScreen(postViewModel, postId)
                 } else {
                     Text(
                         "Błąd: Nie można załadować postów użytkownika.",

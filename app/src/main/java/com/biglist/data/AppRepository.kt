@@ -9,6 +9,8 @@ interface AppRepository {
     suspend fun getAllPosts(): List<Post>
 
     suspend fun getUserPosts(userId: Int): List<Post>
+    suspend fun getPostById(id: Int): Post
+    suspend fun getUserById(id: Int): User
 
 }
 
@@ -23,6 +25,10 @@ class AppRepositoryImpl(private val retrofitService: AppService): AppRepository 
     override suspend fun getUserPosts(userId: Int): List<Post> {
         return retrofitService.getUserPosts(userId)
     }
-
-
+    override suspend fun getPostById(id: Int): Post {
+        return retrofitService.getPostById(id)
+    }
+    override suspend fun getUserById(id: Int): User {
+        return retrofitService.getUserById(id)
+    }
 }
