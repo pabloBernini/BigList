@@ -38,11 +38,14 @@ import com.biglist.ui.screens.HomeScreen
 import com.biglist.ui.screens.UserScreen
 import com.biglist.ui.viewModels.PostViewModel
 import com.biglist.ui.viewModels.PostViewModelFactory
+import com.biglist.ui.viewModels.UserViewModel
+import com.biglist.ui.viewModels.UserViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: HomeViewModel
     private lateinit var postViewModel: PostViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +53,15 @@ class MainActivity : ComponentActivity() {
         val app = application as BigListApplication
         val factory = HomeViewModelFactory(app.repository)
         val postFactory = PostViewModelFactory(app.repository)
+        val userFactory = UserViewModelFactory(app.repository)
 
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         postViewModel = ViewModelProvider(this, postFactory)[PostViewModel::class.java]
+        userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
 
         setContent {
             ListUsersTheme {
-                AppScreen(viewModel = viewModel, postViewModel)
+                AppScreen(viewModel = viewModel, postViewModel, userViewModel)
             }
         }
     }
@@ -64,7 +69,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScreen(viewModel: HomeViewModel, postViewModel: PostViewModel) {
+fun AppScreen(
+    viewModel: HomeViewModel,
+    postViewModel: PostViewModel,
+    userViewModel: UserViewModel
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -114,18 +123,28 @@ fun AppScreen(viewModel: HomeViewModel, postViewModel: PostViewModel) {
                     backStackEntry ->
                 HomeScreen(
                     viewModel = viewModel, onUserSelected = { user ->
-                        navController.navigate(NavigationDestinations.USER_SCREEN)
-                        viewModel.onUserSelected(user)
+                        navController.navigate("${NavigationDestinations.USER_SCREEN}/${user.id}")
                     },
                     onPostSelected = { post ->
                         navController.navigate("${NavigationDestinations.POST_SCREEN}/${post.id}")
                     })
             }
             composable(
-                route = NavigationDestinations.USER_SCREEN,
+                route = "${NavigationDestinations.USER_SCREEN}/{id}",
+                arguments = listOf(navArgument("id") {
+                    type = NavType.IntType
+                })
             ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getInt("id")
 
-                UserScreen(viewModel)
+                if (userId != null) {
+                    UserScreen(userViewModel, userId)
+                } else {
+                    Text(
+                        "Error, can't load user details",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
             composable(
                 route = "${NavigationDestinations.POST_SCREEN}/{id}",
@@ -139,7 +158,7 @@ fun AppScreen(viewModel: HomeViewModel, postViewModel: PostViewModel) {
                     PostScreen(postViewModel, postId)
                 } else {
                     Text(
-                        "Błąd: Nie można załadować postów użytkownika.",
+                        "Error, can't load post details",
                         modifier = Modifier.padding(16.dp)
                     )
                 }

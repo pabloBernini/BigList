@@ -1,6 +1,5 @@
 package com.biglist.ui.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -17,9 +16,6 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
 
     private val _usersUiState = MutableStateFlow<UsersUiState>(UsersUiState.Loading)
     val usersUiState: StateFlow<UsersUiState> = _usersUiState.asStateFlow()
-
-    private val _postsUiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading)
-    val postsUiState: StateFlow<PostsUiState> = _postsUiState.asStateFlow()
 
     private val _testUiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading)
     val testUiState: StateFlow<PostsUiState> = _testUiState.asStateFlow()
@@ -51,24 +47,9 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
             try {
                 val fetchedPosts = repository.getAllPosts()
                 _testUiState.value = PostsUiState.Success(fetchedPosts)
-                Log.d("aaa", "bbbb")
 
             } catch (e: IOException) {
                 _testUiState.value = PostsUiState.Error(e)
-            }
-        }
-    }
-
-    //// this should go to diffrent viewModel
-
-    fun onUserSelected(user: User) {
-        _postsUiState.value = PostsUiState.Loading
-        viewModelScope.launch {
-            try {
-                val fetchedPosts = repository.getUserPosts(user.id ?: 0)
-                _postsUiState.value = PostsUiState.Success(fetchedPosts)
-            } catch (e: IOException) {
-                _postsUiState.value = PostsUiState.Error(e)
             }
         }
     }

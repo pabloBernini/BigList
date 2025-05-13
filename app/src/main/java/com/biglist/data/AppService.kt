@@ -1,8 +1,8 @@
 package com.biglist.data
 
 import com.biglist.model.Post
+import com.biglist.model.Todo
 import com.biglist.model.User
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -24,5 +24,9 @@ import retrofit2.http.Query
 
         @GET("/users/{id}")
         suspend fun getUserById(@Path("id") id: Int): User
+
+        @GET("users/{id}/todos")
+        suspend fun getTodoByUserId(@Path("id") id: Int): List<Todo>
+
     }
 

@@ -1,13 +1,11 @@
 package com.biglist.ui.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.biglist.data.AppRepository
 import com.biglist.model.Post
 import com.biglist.model.User
-import com.biglist.ui.viewModels.HomeViewModel.PostsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,17 +42,6 @@ class PostViewModel(private val repository: AppRepository) : ViewModel() {
         data class Error(val error: String) : PostWithUserUiState()
     }
 
-    sealed class PostUiState {
-        data object Loading : PostUiState()
-        data class Success(val post: Post) : PostUiState()
-        data class Error(val error: Throwable) : PostUiState()
-    }
-
-    sealed class UserUiState {
-        data object Loading : UserUiState()
-        data class Success(val user: User) : UserUiState()
-        data class Error(val error: Throwable) : UserUiState()
-    }
 
 }
 

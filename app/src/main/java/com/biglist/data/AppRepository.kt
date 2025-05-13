@@ -1,6 +1,7 @@
 package com.biglist.data
 
 import com.biglist.model.Post
+import com.biglist.model.Todo
 import com.biglist.model.User
 
 
@@ -11,6 +12,7 @@ interface AppRepository {
     suspend fun getUserPosts(userId: Int): List<Post>
     suspend fun getPostById(id: Int): Post
     suspend fun getUserById(id: Int): User
+    suspend fun getTodoByUserId(id: Int): List<Todo>
 
 }
 
@@ -30,5 +32,8 @@ class AppRepositoryImpl(private val retrofitService: AppService): AppRepository 
     }
     override suspend fun getUserById(id: Int): User {
         return retrofitService.getUserById(id)
+    }
+    override suspend fun getTodoByUserId(id: Int): List<Todo> {
+        return retrofitService.getTodoByUserId(id)
     }
 }
