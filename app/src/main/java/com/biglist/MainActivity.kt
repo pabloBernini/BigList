@@ -85,7 +85,7 @@ fun AppScreen(
                     Text(
                         when (currentRoute) {
                             NavigationDestinations.HOME_SCREEN -> "Users List"
-                            NavigationDestinations.USER_SCREEN -> "User Details"
+                            "${NavigationDestinations.USER_SCREEN}/{id}" -> "User Details"
                             "${NavigationDestinations.POST_SCREEN}/{id}" -> "Post Details"
                             else -> ""
                         }, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
@@ -108,7 +108,7 @@ fun AppScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary) // Use MaterialTheme colors
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary) // Use MaterialTheme colors
             )
         }) { paddingValues ->
         NavHost(

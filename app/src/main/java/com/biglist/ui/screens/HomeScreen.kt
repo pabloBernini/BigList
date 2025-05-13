@@ -80,7 +80,7 @@ fun ErrorMessage(message: String) {
 fun PostItemHome(post: Post, user: User, onUserClick: (User) -> Unit, onPostClick: (Post) -> Unit) {
 
     Card(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(0.dp),
         elevation = CardDefaults.elevatedCardElevation(8.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -89,7 +89,6 @@ fun PostItemHome(post: Post, user: User, onUserClick: (User) -> Unit, onPostClic
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -113,16 +112,15 @@ fun PostItemHome(post: Post, user: User, onUserClick: (User) -> Unit, onPostClic
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier
-                    .padding(10.dp)
                     .clickable { onPostClick(post) }
+                    .weight(1f)
+                    .padding(20.dp)
             ) {
-
                 Text(
                     text = post.title ?: "",
                     fontSize = 20.sp,
                 )
             }
-
         }
     }
 }

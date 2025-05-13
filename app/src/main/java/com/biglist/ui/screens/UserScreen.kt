@@ -1,19 +1,23 @@
 package com.biglist.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +49,6 @@ fun UserScreen(viewModel: UserViewModel, userId: Int) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     UserScreenContent(user = user)
-                    Spacer(modifier = Modifier.height(8.dp))
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
@@ -56,6 +59,7 @@ fun UserScreen(viewModel: UserViewModel, userId: Int) {
                 }
             }
         }
+
         is UserViewModel.UserWithTodosUiState.Error -> {
             val error = (userWithTodosUiState as UserViewModel.UserWithTodosUiState.Error).error
             ErrorMessage(error)
@@ -69,40 +73,66 @@ fun UserScreen(viewModel: UserViewModel, userId: Int) {
 @Composable
 fun UserScreenContent(user: User) {
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
     ) {
         Text(
-            text = user.username ?: "",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            text = "Name - ${user.name}", fontSize = 15.sp, fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = user.email ?: "No email available",
-            fontSize = 16.sp,
-            color = Color.Gray
+            text = "Username - ${user.username}", fontSize = 15.sp, fontWeight = FontWeight.Bold
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Email - ${user.email}", fontSize = 15.sp, fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Phone Number - ${user.phone}", fontSize = 15.sp, fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Website - ${user.website}", fontSize = 15.sp, fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Company:", fontSize = 15.sp, fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Street - ${user.company?.name}\n" + "Suite - ${user.company?.catchPhrase}\n" + "City - ${user.company?.bs}",
+            fontSize = 15.sp,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
 
-
+        Text(
+            text = "Address:", fontSize = 15.sp, fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Street - ${user.address?.street}\n" + "Suite - ${user.address?.suite}\n" + "City - ${user.address?.city}\n" + "Zipcode - ${user.address?.zipcode}",
+            fontSize = 15.sp,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Todos",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
 @Composable
 fun TodoItem(todo: Todo) {
-    Column(
-        modifier = Modifier.padding(16.dp)
+    Row(
+        modifier = Modifier.padding(16.dp, 0.dp)
     ) {
         Text(
-            text = todo.title ?: "",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            text = todo.title ?: "", fontSize = 15.sp
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Is todo done? ${todo.completed}",
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Checkbox(checked = todo.completed ?: false, onCheckedChange = null, enabled = false)
 
 
     }
