@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,16 +28,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.biglist.model.Todo
 import com.biglist.model.User
 import com.biglist.ui.viewModels.UserViewModel
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun UserScreen(viewModel: UserViewModel, userId: Int) {
-
-/////////////
     LaunchedEffect(userId) {
         viewModel.getUserWithTodos(userId)
-
     }
+
     val userWithTodosUiState by viewModel.userWithTodosUiState.collectAsStateWithLifecycle()
 
     when (userWithTodosUiState) {
@@ -44,25 +51,61 @@ fun UserScreen(viewModel: UserViewModel, userId: Int) {
         is UserViewModel.UserWithTodosUiState.Success -> {
             val user = (userWithTodosUiState as UserViewModel.UserWithTodosUiState.Success).user
             val todos = (userWithTodosUiState as UserViewModel.UserWithTodosUiState.Success).todos
-            if (todos != null) {
-
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
+            val lat = user.address?.geo?.lat?.toDoubleOrNull() ?: 0.0
+            val lng = user.address?.geo?.lng?.toDoubleOrNull() ?: 0.0
+            val cameraPosition = LatLng(lat, lng)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                item {
                     UserScreenContent(user = user)
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(todos) { todo ->
-                            TodoItem(todo = todo)
+                }
+
+
+
+                todos?.let { todoList ->
+                    items(todoList) { todo ->
+                        TodoItem(todo = todo)
+                    }
+                }
+                item {
+
+
+                    ///////////////////////////////google map
+
+                    val markerState = remember { MarkerState(position = cameraPosition) }
+                    Column {
+                        Text(
+                            text = "User Location",
+                            modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 4.dp),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Card(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        ) {
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = rememberCameraPositionState {
+                                    position = CameraPosition.fromLatLngZoom(cameraPosition, 1f)
+                                }
+                            ) {
+                                Marker(
+                                    state = markerState,
+                                    title = user.name,
+                                    snippet = user.address?.city
+                                )
+                            }
                         }
                     }
-
-                }
-                GoogleMap(){
-
-                }
-            }
+                    ///////////////////////
+            }}
         }
 
         is UserViewModel.UserWithTodosUiState.Error -> {
