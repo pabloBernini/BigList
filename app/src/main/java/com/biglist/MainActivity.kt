@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var postViewModel: PostViewModel
     private lateinit var userViewModel: UserViewModel
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

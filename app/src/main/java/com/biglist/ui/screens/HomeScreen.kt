@@ -33,6 +33,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
 import com.biglist.model.Post
 import androidx.compose.material3.CircularProgressIndicator
+import com.google.maps.android.compose.GoogleMap
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -47,6 +49,7 @@ fun HomeScreen(
         }
 
         is HomeViewModel.PostsUiState.Success -> {
+
             val postsList = (postsUiState as HomeViewModel.PostsUiState.Success).posts
 
             LazyColumn {

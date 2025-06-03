@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.biglist.model.Todo
 import com.biglist.model.User
 import com.biglist.ui.viewModels.UserViewModel
+import com.google.maps.android.compose.GoogleMap
 
 @Composable
 fun UserScreen(viewModel: UserViewModel, userId: Int) {
@@ -56,6 +57,10 @@ fun UserScreen(viewModel: UserViewModel, userId: Int) {
                             TodoItem(todo = todo)
                         }
                     }
+
+                }
+                GoogleMap(){
+
                 }
             }
         }
