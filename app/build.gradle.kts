@@ -62,4 +62,10 @@ dependencies {
     implementation(libs.converter.gson)
     implementation (libs.androidx.navigation.compose)
     implementation(libs.maps.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation (libs.coil.compose)
+    implementation (libs.androidx.activity.activity.compose.v190)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.view)
 }

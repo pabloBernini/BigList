@@ -5,10 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,34 +34,44 @@ import com.biglist.ui.viewModels.HomeViewModelFactory
 import com.biglist.ui.theme.ListUsersTheme
 import com.biglist.model.NavigationDestinations
 import com.biglist.ui.screens.HomeScreen
+import com.biglist.ui.screens.UserDetailsScreen
 import com.biglist.ui.screens.UserScreen
 import com.biglist.ui.viewModels.PostViewModel
 import com.biglist.ui.viewModels.PostViewModelFactory
+import com.biglist.ui.viewModels.UserDetailsViewModel
 import com.biglist.ui.viewModels.UserViewModel
 import com.biglist.ui.viewModels.UserViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: HomeViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var postViewModel: PostViewModel
     private lateinit var userViewModel: UserViewModel
+    private lateinit var userDetailsViewModel: UserDetailsViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val app = application as BigListApplication
-        val factory = HomeViewModelFactory(app.repository)
+        val homeFactory = HomeViewModelFactory(app.repository)
         val postFactory = PostViewModelFactory(app.repository)
         val userFactory = UserViewModelFactory(app.repository)
 
-        viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
+        userDetailsViewModel = ViewModelProvider(this)[UserDetailsViewModel::class.java]
+        homeViewModel = ViewModelProvider(this, homeFactory)[HomeViewModel::class.java]
         postViewModel = ViewModelProvider(this, postFactory)[PostViewModel::class.java]
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
 
+
         setContent {
             ListUsersTheme {
-                AppScreen(viewModel = viewModel, postViewModel, userViewModel)
+                AppScreen(
+                    homeViewModel = homeViewModel,
+                    postViewModel = postViewModel,
+                    userViewModel = userViewModel,
+                    userDetailsViewModel = userDetailsViewModel
+                )
             }
         }
     }
@@ -71,9 +80,10 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScreen(
-    viewModel: HomeViewModel,
+    homeViewModel: HomeViewModel,
     postViewModel: PostViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    userDetailsViewModel: UserDetailsViewModel
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -88,6 +98,7 @@ fun AppScreen(
                             NavigationDestinations.HOME_SCREEN -> "Users List"
                             "${NavigationDestinations.USER_SCREEN}/{id}" -> "User Details"
                             "${NavigationDestinations.POST_SCREEN}/{id}" -> "Post Details"
+                            NavigationDestinations.USER_DETAILS_SCREEN -> "My Details"
                             else -> ""
                         }, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
                     )
@@ -101,17 +112,18 @@ fun AppScreen(
                             )
                         }
                     } else {
-
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Home",
-                            modifier = Modifier.size(24.dp)
-                        )
+                        IconButton(onClick = { navController.navigate(NavigationDestinations.USER_DETAILS_SCREEN) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "Back",
+                            )
+                        }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary) // Use MaterialTheme colors
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary)
             )
-        }) { paddingValues ->
+        }
+    ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = NavigationDestinations.HOME_SCREEN,
@@ -120,15 +132,15 @@ fun AppScreen(
             composable(
                 NavigationDestinations.HOME_SCREEN
             ) {
-
-                    backStackEntry ->
                 HomeScreen(
-                    viewModel = viewModel, onUserSelected = { user ->
+                    viewModel = homeViewModel,
+                    onUserSelected = { user ->
                         navController.navigate("${NavigationDestinations.USER_SCREEN}/${user.id}")
                     },
                     onPostSelected = { post ->
                         navController.navigate("${NavigationDestinations.POST_SCREEN}/${post.id}")
-                    })
+                    }
+                )
             }
             composable(
                 route = "${NavigationDestinations.USER_SCREEN}/{id}",
@@ -164,7 +176,17 @@ fun AppScreen(
                     )
                 }
             }
+            composable(route = NavigationDestinations.USER_DETAILS_SCREEN) {
+                UserDetailsScreen(
+                    viewModel = userDetailsViewModel,
+                onUserDetailsSaved = {
+                    navController.navigate(NavigationDestinations.HOME_SCREEN) {
+                        popUpTo(NavigationDestinations.HOME_SCREEN) {
+                            inclusive = true
+                        }
+                }}
+                )
+            }
         }
     }
 }
-
