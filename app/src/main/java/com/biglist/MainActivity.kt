@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -114,7 +114,7 @@ fun AppScreen(
                     } else {
                         IconButton(onClick = { navController.navigate(NavigationDestinations.USER_DETAILS_SCREEN) }) {
                             Icon(
-                                imageVector = Icons.Filled.Settings,
+                                imageVector = Icons.Filled.Person,
                                 contentDescription = "Back",
                             )
                         }
